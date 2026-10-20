@@ -3,9 +3,26 @@
 #include <string>
 #include <fstream>
 #include <vector>
+#include <direct.h>
 
  using namespace std;
- void addorder(){cout << "add order;" << "\n";}
+ bool append_to_file(string path, string text);
+
+ void add_order(){
+    //id	user_name	phone	address	created_at	order_status	delivery_status	total_price	quantity	discount	comment
+    cout << "Формування замовлення" << endl;
+    string name, address, product, qty, price;
+    cout << "Ім'я: "; getline(cin, name);
+    cout << "Адреса: "; getline(cin, address);
+    cout << "Товар: "; getline(cin, product);
+    cout << "Кількість: "; getline(cin, qty);
+    cout << "Ціна: "; getline(cin, price);
+    string data = name + "\t" + address + "\t" + product + "\t" + qty + "\t" + price +"\n";
+    if (append_to_file("data/orders.txt", data))
+        cout << "Замовлення додано." << endl;
+    else
+        cout << "Помилка запису." << endl;
+}
  void seeOrder(){cout << "see order;" << "\n";}
  void seeOneOrder(){cout << "see one order;" << "\n";}
  void updateOrder(){cout << "update order;" << "\n";}
@@ -29,10 +46,11 @@ void main_menu(){
         cout <<"--------------------"<< endl;
         cout <<"Зробіть свій вибір: ";
         cin >> choice;
+        cin.ignore();
 
         switch (choice) {
             case 1:
-                addorder();
+                add_order();
                 is_choice_made = true;
                 break;
             case 2:
@@ -102,16 +120,10 @@ bool overwrite_file(string path, string text) {
     return false;
 }
 
-
-
-
-
-
-
-
   int main(){
         SetConsoleOutputCP(CP_UTF8);
         SetConsoleCP(CP_UTF8);
+        _mkdir("data");
     main_menu();
     vector<string> lines = read_file("data/orders.txt");
     for (const string &item : lines)
