@@ -5,19 +5,23 @@
 #include <vector>
 #include <direct.h>
 
+
  using namespace std;
  bool append_to_file(string path, string text);
 
  void add_order(){
     //id	user_name	phone	address	created_at	order_status	delivery_status	total_price	quantity	discount	comment
     cout << "Формування замовлення" << endl;
-    string name, address, product, qty, price;
+    string name, phone, address, product, qty, price, discount, comment;
     cout << "Ім'я: "; getline(cin, name);
+    cout << "Телефон: "; getline(cin, phone);
     cout << "Адреса: "; getline(cin, address);
     cout << "Товар: "; getline(cin, product);
     cout << "Кількість: "; getline(cin, qty);
     cout << "Ціна: "; getline(cin, price);
-    string data = name + "\t" + address + "\t" + product + "\t" + qty + "\t" + price +"\n";
+    cout << "Знижка (%): "; getline(cin, discount);
+    cout << "Коментар: "; getline(cin, comment);
+    string data = name + "\t" + address + "\t" + product + "\t" + qty + "\t" + price +"\n" + discount +"\n" + comment +"\n";
     if (append_to_file("data/orders.txt", data))
         cout << "Замовлення додано." << endl;
     else
@@ -28,7 +32,7 @@
  void updateOrder(){cout << "update order;" << "\n";}
  void deleteOrder(){cout << "delete order;" << "\n";}
  void createOrder(){cout << "create order;" << "\n";}
- void exit(){cout << "exit;" << "\n";}
+ void exit_app(){cout << "exit;" << "\n";}
 
 void main_menu(){
     int choice;
@@ -47,6 +51,9 @@ void main_menu(){
         cout <<"Зробіть свій вибір: ";
         cin >> choice;
         cin.ignore();
+
+
+
 
         switch (choice) {
             case 1:
