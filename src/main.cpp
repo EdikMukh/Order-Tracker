@@ -4,29 +4,13 @@
 #include <fstream>
 #include <vector>
 #include <direct.h>
-
+#include "./utils/file_utils.h"
+#include "./ui/handlers/add_order.h"
 
  using namespace std;
  bool append_to_file(string path, string text);
 
- void add_order(){
-    //id	user_name	phone	address	created_at	order_status	delivery_status	total_price	quantity	discount	comment
-    cout << "Формування замовлення" << endl;
-    string name, phone, address, product, qty, price, discount, comment;
-    cout << "Ім'я: "; getline(cin, name);
-    cout << "Телефон: "; getline(cin, phone);
-    cout << "Адреса: "; getline(cin, address);
-    cout << "Товар: "; getline(cin, product);
-    cout << "Кількість: "; getline(cin, qty);
-    cout << "Ціна: "; getline(cin, price);
-    cout << "Знижка (%): "; getline(cin, discount);
-    cout << "Коментар: "; getline(cin, comment);
-    string data = name + "\t" + address + "\t" + product + "\t" + qty + "\t" + price +"\n" + discount +"\n" + comment +"\n";
-    if (append_to_file("data/orders.txt", data))
-        cout << "Замовлення додано." << endl;
-    else
-        cout << "Помилка запису." << endl;
-}
+ 
  void seeOrder(){cout << "see order;" << "\n";}
  void seeOneOrder(){cout << "see one order;" << "\n";}
  void updateOrder(){cout << "update order;" << "\n";}
@@ -92,40 +76,7 @@ void main_menu(){
         }
 
     }}  
-// ------------file ultilites------------
-vector<string> read_file(string patch){
-    ifstream file(patch);
-    vector<string> lines;
-    if (file.is_open()){
-        string line;
-        while (getline(file, line))
-            lines.push_back(line);
-    };
-    return lines;
-}
 
-
-bool append_to_file(string path, string text) {
-    ofstream file(path, ios::app);
-    if (file.is_open()) {
-        file << text << endl; 
-        file.close();
-        return true; 
-    }
-    return false;
-}
-
-
-
-bool overwrite_file(string path, string text) {
-    ofstream file(path); 
-    if (file.is_open()) {
-        file << text; 
-        file.close();
-        return true;
-    }
-    return false;
-}
 
   int main(){
         SetConsoleOutputCP(CP_UTF8);
