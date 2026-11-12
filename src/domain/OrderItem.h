@@ -24,9 +24,9 @@ class OrderItem{
         return cost;
     }
     string to_string(){
-    string orderItem = std::to_string(product_id) + "~" + name + "~"
-                     + std::to_string(quantity) + "~"
-                     + std::to_string(price) + "~"
+    string orderItem = std::to_string(product_id) + "\t" + name + "\t"
+                     + std::to_string(quantity) + "\t"
+                     + std::to_string(price) + "\t"
                      + std::to_string(cost);
     return orderItem;   // <-- добавь это
 }

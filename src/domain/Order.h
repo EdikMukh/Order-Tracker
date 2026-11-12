@@ -45,7 +45,7 @@ public:
 
         // ---- total: перебираємо items і додаємо cost ----
         this->total = 0;
-        for (size_t i = 0; i < items.size(); i++) {
+        for (int i = 0; i < items.size(); i++) {
             this->total += items[i].get_cost();
         }
 
@@ -98,15 +98,15 @@ public:
     }
 
     string to_string() {
-        string order = std::to_string(order_id) + "~"
-                     + std::to_string(user_id)  + "~"
-                     + user_name + "~"
-                     + phone + "~"
-                     + adress + "~"
-                     + order_status + "~"
-                     + std::to_string(total) + "~"
-                     + std::to_string(discount) + "~"
-                     + std::to_string(created_at) + "~"
+        string order = std::to_string(order_id) + "\t"
+                     + std::to_string(user_id)  + "\t"
+                     + user_name + "\t"
+                     + phone + "\t"
+                     + adress + "\t"
+                     + order_status + "\t"
+                     + std::to_string(total) + "\t"
+                     + std::to_string(discount) + "\t"
+                     + std::to_string(created_at) + "\t"
                      + std::to_string(updated_at);
         return order;
     }
