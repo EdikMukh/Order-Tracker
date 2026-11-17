@@ -1,9 +1,10 @@
+#pragma once
 #include <vector>
 #include <sstream>
 #include <fstream>
 #include <iostream>
 #include <string>
-#include "Product.h" 
+#include "../domain/Product.h"
 #include "../utils/file_utils.h"
 
 using namespace std;

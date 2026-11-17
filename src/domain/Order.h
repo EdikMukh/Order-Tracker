@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 #include <vector>
 #include <ctime>
@@ -33,7 +34,7 @@ public:
         // ---- значення з customer ----
         this->user_id   = customer.user_id;
         this->user_name = customer.user_name;
-        this->phone     = customer.phone;
+        this->phone     = "380909090";
         this->adress    = customer.address;
 
         // ---- items поки що порожній (заповнюється через add_item) ----

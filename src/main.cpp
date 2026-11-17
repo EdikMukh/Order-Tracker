@@ -6,6 +6,7 @@
 #include <direct.h>
 #include "./utils/file_utils.h"
 #include "./ui/handlers/add_order.h"
+#include "ui/OrderControler.h"
 
  using namespace std;
  bool append_to_file(string path, string text);
@@ -82,6 +83,7 @@ void main_menu(){
         SetConsoleOutputCP(CP_UTF8);
         SetConsoleCP(CP_UTF8);
         _mkdir("data");
+         OrderController controller;
     main_menu();
     vector<string> lines = read_file("data/orders.txt");
     for (const string &item : lines)

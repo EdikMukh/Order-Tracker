@@ -1,9 +1,10 @@
+#pragma once
 #include <iostream>
 #include <vector>
 #include <string>
-#include "OrderManager.h"
-#include "UserManager.h"
-#include "ProductManager.h"
+#include "../services/OrderManager.h"
+#include "../services/ProductManager.h"
+#include "../services/UserManager.h"
 
 using namespace std;
 
@@ -14,27 +15,34 @@ private:
     ProductManager prod_mgr;
 
 public:
-    OrderController() {} // Менеджери самі завантажать дані при створенні
+    OrderController() {
+        UserManager manager_user;
+        user_mgr = manager_user;
+        ProductManager manager_product;
+        prod_mgr = manager_product;
+        OrderManager manager_order;
+        order_mgr = manager_order;
+    } // Менеджери самі завантажать дані при створенні
 
     // 1. Створити замовлення (перевіряє юзера і товар)
     void create_order() {
         int u_id, p_id;
         cout << "ID клієнта: "; cin >> u_id;
-        
+        // !-це оператор логічного заперечення
         if (!user_mgr.find_by_id(u_id)) { 
             cout << "Клієнта не знайдено!\n"; return; 
         }
 
         cout << "ID товару: "; cin >> p_id;
         Product* p = prod_mgr.find_by_id(p_id);
-        
+        // || - це оператор логічного "АБО"
         if (!p || p->quantity <= 0) { 
             cout << "Товару немає!\n"; return; 
         }
 
         // Створюємо замовлення (спрощено, без кошика)
         Order new_o(0, u_id, user_mgr.find_by_id(u_id)->user_name, 
-                    user_mgr.find_by_id(u_id)->phone, 
+                    user_mgr.find_by_id(u_id)->phones[0],
                     user_mgr.find_by_id(u_id)->address, 
                     {}, "Нове", p->price, "", 0, "", time(0), time(0), 0);
 
@@ -44,7 +52,7 @@ public:
         
         cout << "Успішно створено!\n";
     }
-
+// | - це побітовий оператор "АБО"
     // 2. Показати всі замовлення
     void show_orders() {
         vector<Order> list = order_mgr.get_all_orders();
@@ -58,13 +66,13 @@ public:
     void find_order() {
         int id; cout << "ID замовлення: "; cin >> id;
         Order* o = order_mgr.find_by_id(id);
-        if (o) cout << "Знайдено: " << o->user_name << " (" << o->order_status << ")\n";
+        if (o) cout << "Знайдено: " << o->user_name << " (" << o->order_status << ")\n";//вказівник o вказує на реальний об'єкт у пам'яті.
         else cout << "Не знайдено.\n";
     }
 
     // 4. Змінити статус
     void edit_status() {
-        int id; cout << "ID замовлення: "; cin >> id;
+        int id; cout << "ID замовлення: "; cin >> id;// cin - зчитування даних з клавіатури
         Order* o = order_mgr.find_by_id(id);
         if (o) {
             cout << "Новий статус: "; cin >> o->order_status;
