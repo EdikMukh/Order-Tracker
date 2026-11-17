@@ -17,7 +17,7 @@ public:
     }
 
     void read_from_file() {
-        vector<string> lines = read_file("data/products.txt");//читаємо з файлу
+        vector<string> lines = read_file("data/products.txt"); // читаємо з файлу
 
         for (int i = 0; i < lines.size(); i++) {
             string line = lines[i];
@@ -41,7 +41,6 @@ public:
                 int quantity   = stoi(s_quantity);
 
                 // Викликаємо КОНСТРУКТОР 2 (для читання з файлу)
-                // Зверніть увагу на останній аргумент: true (це bool from_file)
                 Product product(
                     product_id, 
                     name, 
@@ -67,5 +66,24 @@ public:
             }
         }
         return nullptr;
+    }
+
+    //Метод для збереження продуктів у файл
+    void save_to_file() {
+        ofstream file("data/products.txt");
+        if (!file.is_open()) {
+            cout << "Не вдалося відкрити файл для запису!" << endl;
+            return;
+        }
+
+        for (int i = 0; i < products.size(); i++) {
+            // Записуємо поля через табуляцію '\t', як і при читанні
+            file << products[i].product_id << '\t'
+                 << products[i].name << '\t'
+                 << products[i].description << '\t'
+                 << products[i].price << '\t'
+                 << products[i].quantity << '\n';
+        }
+        file.close();
     }
 };
