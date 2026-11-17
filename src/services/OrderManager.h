@@ -37,12 +37,12 @@ public:
             getline(iss, s_total, '\t');
             getline(iss, s_discount, '\t');
             getline(iss, s_created_at, '\t');
-            getline(iss, s_updated_at, '\t');
+            getline(iss, s_updated_at, '\t');//Цей рядок читає останнє поле з рядка файлу під час парсингу замовлення.
 
-            if (s_order_id.empty() || s_user_id.empty() || user_name.empty()) {
-                cout << "Невалідні дані у рядку " << (i + 1) << ": пропущено." << endl;
-                continue;
-            }
+            //if (s_order_id.empty() || s_user_id.empty() || user_name.empty()) {
+                //cout << "Невалідні дані у рядку " << (i + 1) << ": пропущено." << endl;
+                //continue;
+            //}
 
             try {
                 int order_id     = stoi(s_order_id);
@@ -74,7 +74,7 @@ public:
                 return &orders[i];//"Пройтися по всіх замовленнях, знайти потрібне за ID і віддати його адресу".
             }
         }
-        return nullptr;
+        return nullptr; //функція повертає нульовий вказівник
     }
 
     void add_order(const Order& order) {
@@ -86,13 +86,13 @@ public:
         return orders;
     }
 
-    bool edit_order(int id, const Order& updated) {
+    bool edit_order(int id, const Order& updated) { //const Order& updated	Параметр: нове замовлення з оновленими даними
         Order* existing = find_by_id(id);
         if (existing == nullptr) {
             cout << "Замовлення з id=" << id << " не знайдено." << endl;
             return false;
         }
-        *existing = updated; 
+        *existing = updated;//У цьому рядку відбувається заміна вмісту замовлення.
         save_to_file();
         return true;//Це метод редагування замовлення за його ID. Він знаходить замовлення, замінює його на нові дані та зберігає зміни у файл.
     }
@@ -110,3 +110,4 @@ public:
 //Це метод, який зберігає всі замовлення у файл (перезаписує його повністю).
     }
 };
+
