@@ -42,13 +42,15 @@ public:
                 int quantity   = stoi(s_quantity);
 
                 // Викликаємо КОНСТРУКТОР 2 (для читання з файлу)
+                // Порядок і типи аргументів повністю збігаються з конструктором:
+                // (int, string, string, int, int, bool)
                 Product product(
-                    product_id, 
-                    name, 
-                    description, 
-                    price, 
-                    quantity, 
-                    true   // <--- Обов'язково передаємо true!
+                    product_id,   // int
+                    name,         // string
+                    description,  // string
+                    price,        // int
+                    quantity,     // int
+                    true          // bool — маркер "з файлу"
                 );
 
                 products.push_back(product);
@@ -69,7 +71,7 @@ public:
         return nullptr;
     }
 
-    //Метод для збереження продуктів у файл
+    // Метод для збереження продуктів у файл
     void save_to_file() {
         ofstream file("data/products.txt");
         if (!file.is_open()) {
