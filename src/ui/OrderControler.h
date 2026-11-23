@@ -15,15 +15,6 @@ private:
     ProductManager prod_mgr;
 
 public:
-    OrderController() {
-        UserManager manager_user;
-        user_mgr = manager_user;
-        ProductManager manager_product;
-        prod_mgr = manager_product;
-        OrderManager manager_order;
-        order_mgr = manager_order;
-    } // Менеджери самі завантажать дані при створенні
-
     // 1. Створити замовлення (перевіряє юзера і товар)
     void create_order() {
         int u_id, p_id;

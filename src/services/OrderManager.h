@@ -4,8 +4,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-#include <ctime>
-#include "../domain/Order.h" 
+#include "../domain/Order.h"
 #include "../utils/file_utils.h"
 
 using namespace std;
@@ -19,95 +18,79 @@ public:
     }
 
     void read_from_file() {
-        vector<string> lines = read_file("data/orders.txt");
+        vector<string> lines = read_file("data/orders.txt"); // читаємо з файлу
 
         for (int i = 0; i < lines.size(); i++) {
             string line = lines[i];
             if (line.empty()) continue;
 
-            string s_order_id, s_user_id, user_name, phone, adress;
-            string order_status, s_total, s_discount, s_created_at, s_updated_at;
+            // Змінні для зчитування з файлу
+            string s_order_id, s_product_id, s_quantity;
+            string s_total_price, customer, status;
 
             istringstream iss(line);
-            getline(iss, s_order_id, '\t');
-            getline(iss, s_user_id, '\t');
-            getline(iss, user_name, '\t');
-            getline(iss, phone, '\t');
-            getline(iss, adress, '\t');
-            getline(iss, order_status, '\t');
-            getline(iss, s_total, '\t');
-            getline(iss, s_discount, '\t');
-            getline(iss, s_created_at, '\t');
-            getline(iss, s_updated_at, '\t');//Цей рядок читає останнє поле з рядка файлу під час парсингу замовлення.
-
-            //if (s_order_id.empty() || s_user_id.empty() || user_name.empty()) {
-                //cout << "Невалідні дані у рядку " << (i + 1) << ": пропущено." << endl;
-                //continue;
-            //}
+            getline(iss, s_order_id,    '\t');
+            getline(iss, s_product_id,  '\t');
+            getline(iss, s_quantity,    '\t');
+            getline(iss, s_total_price, '\t');
+            getline(iss, customer,      '\t');
+            getline(iss, status,        '\t');
 
             try {
-                int order_id     = stoi(s_order_id);
-                int user_id      = stoi(s_user_id);
-                int total        = stoi(s_total);
-                int discount     = s_discount.empty() ? 0 : stoi(s_discount);
-                time_t created_at = (time_t)stol(s_created_at);// time_t призначений для зберігання моменту часу (дати й часу).
-                time_t updated_at = (time_t)stol(s_updated_at);
+                // Перетворюємо рядки у числа (усі гроші/кількості - int)
+                int order_id    = stoi(s_order_id);
+                int product_id  = stoi(s_product_id);
+                int quantity    = stoi(s_quantity);
+                int total_price = stoi(s_total_price);
 
-                vector<OrderItem> empty_items;
-                
+                // Викликаємо КОНСТРУКТОР 2 (для читання з файлу)
+                // Порядок і типи аргументів повністю збігаються з конструктором:
+                // (int, int, int, int, string, string, bool)
                 Order order(
-                    order_id, user_id, user_name, phone, adress,
-                    empty_items, order_status, total, "", 0, "", 
-                    created_at, updated_at, discount
+                    order_id,     // int
+                    product_id,   // int
+                    quantity,     // int
+                    total_price,  // int
+                    customer,     // string
+                    status,       // string
+                    true          // bool — маркер "з файлу"
                 );
 
                 orders.push_back(order);
-            } 
-            catch (const exception& e) { //catch Ключове слово: "зловити виняток". Спрацьовує, якщо в блоці try сталася помилка.
-                cout << "Помилка парсингу рядка " << (i + 1) << ". Пропущено." << endl;
+            }
+            catch (const exception& e) {
+                cout << "Невалідні дані у рядку " << (i + 1)
+                     << ": неможливо додати замовлення. Пропущено." << endl;
             }
         }
     }
 
     Order* find_by_id(int id) {
-        for (int i = 0; i < orders.size(); i++) { //size() — метод (функція), що належить вектору.
+        for (int i = 0; i < orders.size(); i++) {
             if (orders[i].order_id == id) {
-                return &orders[i];//"Пройтися по всіх замовленнях, знайти потрібне за ID і віддати його адресу".
+                return &orders[i];
             }
         }
-        return nullptr; //функція повертає нульовий вказівник
+        return nullptr;
     }
 
-    void add_order(const Order& order) {
-        orders.push_back(order); 
-        save_to_file();//додає нове замовлення у колекцію та одразу зберігає його на диск.         
-    }
-
-    vector<Order> get_all_orders() const {//const «це не можна змінювати».
-        return orders;
-    }
-
-    bool edit_order(int id, const Order& updated) { //const Order& updated	Параметр: нове замовлення з оновленими даними
-        Order* existing = find_by_id(id);
-        if (existing == nullptr) {
-            cout << "Замовлення з id=" << id << " не знайдено." << endl;
-            return false;
-        }
-        *existing = updated;//У цьому рядку відбувається заміна вмісту замовлення.
-        save_to_file();
-        return true;//Це метод редагування замовлення за його ID. Він знаходить замовлення, замінює його на нові дані та зберігає зміни у файл.
-    }
-
+    // Метод для збереження замовлень у файл
     void save_to_file() {
-        ofstream file("data/orders.txt"); 
+        ofstream file("data/orders.txt");
         if (!file.is_open()) {
             cout << "Не вдалося відкрити файл для запису!" << endl;
             return;
         }
+
         for (int i = 0; i < orders.size(); i++) {
-            file << orders[i].to_string() << '\n';
+            // Записуємо поля через табуляцію '\t', як і при читанні
+            file << orders[i].order_id    << '\t'
+                 << orders[i].product_id  << '\t'
+                 << orders[i].quantity    << '\t'
+                 << orders[i].total_price << '\t'
+                 << orders[i].customer    << '\t'
+                 << orders[i].status      << '\n';
         }
-        file.close(); 
-//Це метод, який зберігає всі замовлення у файл (перезаписує його повністю).
+        file.close();
     }
 };
