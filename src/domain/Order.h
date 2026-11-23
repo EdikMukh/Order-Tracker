@@ -1,59 +1,55 @@
 #pragma once
 #include <string>
-
+#include <vector>
+#include "OrderItem.h"
 using namespace std;
 
-class Order
-{
+class Order {
 public:
     int order_id;
-    int product_id;     // який продукт замовлено
-    int quantity;       // скільки одиниць
-    int total_price;    // загальна вартість у копійках
-    string customer;    // ім'я/логін покупця
-    string status;      // напр. "new", "paid", "shipped"
+    string customer;
+    int customer_id;
+    string phone;
+    string delivery_address;
+    string status;
+    vector<OrderItem> items;
+    int discount;
+    string comment;
+    string created_at;
+    string updated_at;
+    int total_price;
 
-public:
-    // ===== КОНСТРУКТОР 1: звичайний (створення вручну) =====
-    // Порядок параметрів узгоджено з Конструктором 2 та з полями файлу:
-    // order_id, product_id, quantity, total_price, customer, status
-    Order(int order_id, int product_id, int quantity,
-          int total_price, string customer, string status)
+    // Конструктор 1: звичайний (12 полів, порядок як у файлі)
+    Order(int order_id, string customer, int customer_id, string phone,
+          string delivery_address, string status, vector<OrderItem> items,
+          int discount, string comment, string created_at, string updated_at,
+          int total_price)
     {
-        this->order_id    = order_id;
-        this->product_id  = product_id;
-        this->quantity    = quantity;
-        this->total_price = total_price;
-        this->customer    = customer;
-        this->status      = status;
+        this->order_id         = order_id;
+        this->customer         = customer;
+        this->customer_id      = customer_id;
+        this->phone            = phone;
+        this->delivery_address = delivery_address;
+        this->status           = status;
+        this->items            = items;
+        this->discount         = discount;
+        this->comment          = comment;
+        this->created_at       = created_at;
+        this->updated_at       = updated_at;
+        this->total_price      = total_price;
     };
 
-    // ===== КОНСТРУКТОР 2: для читання з файлу orders.txt =====
-    // Приймає всі поля і записує у відповідні поля класу.
-    // Останній bool from_file — щоб відрізнити від конструктора 1.
-    // Делегує всю роботу Конструктору 1, щоб не дублювати код.
-    Order(int order_id,
-          int product_id,
-          int quantity,
-          int total_price,
-          string customer,
-          string status,
-          bool from_file)
-        : Order(order_id, product_id, quantity, total_price, customer, status)
-    {
-        // from_file навмисно не використовується —
-        // він потрібен лише для розрізнення перевантаження.
-    }
+    // Конструктор 2: з файлу (делегує Конструктору 1)
+    Order(int order_id, string customer, int customer_id, string phone,
+          string delivery_address, string status, vector<OrderItem> items,
+          int discount, string comment, string created_at, string updated_at,
+          int total_price, bool from_file)
+        : Order(order_id, customer, customer_id, phone, delivery_address, status,
+                items, discount, comment, created_at, updated_at, total_price)
+    {}
 
-    int get_order_id() {
-        return order_id;
-    };
-
-    int get_total_price() {
-        return total_price;
-    };
-
-    string get_status() {
-        return status;
-    };
+    int get_order_id()    { return order_id; }
+    int get_total_price() { return total_price; }
+    string get_status()   { return status; }
+    string get_customer() { return customer; }
 };

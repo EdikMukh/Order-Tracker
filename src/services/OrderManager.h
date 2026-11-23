@@ -5,92 +5,113 @@
 #include <iostream>
 #include <string>
 #include "../domain/Order.h"
+#include "../domain/OrderItem.h"
 #include "../utils/file_utils.h"
-
 using namespace std;
 
 class OrderManager {
 public:
     vector<Order> orders;
 
-    OrderManager() {
-        read_from_file();
+    OrderManager() { read_from_file(); }
+
+    // "id, name, price, qty, cost | ..." -> vector<OrderItem>
+    vector<OrderItem> parse_items(const string& s) {
+        vector<OrderItem> res;
+        if (s.empty()) return res;
+        //size_t - беззнаковий цілий тип (не може бути від'ємним), який використовується для розмірів і індексів.
+        size_t pos = 0;
+        while (pos < s.size()) {// pos-position-індекс, з якого зараз починаємо читати рядок (початок поточного товару)
+            size_t sep = s.find(" | ", pos);// sep-seperator-позиція, де знаходиться " | " — розділювач між товарами
+            string chunk = (sep == string::npos) ? s.substr(pos) : s.substr(pos, sep - pos);
+            pos = (sep == string::npos) ? s.size() : sep + 3;
+            vector<string> p;//-порожній список рядків.
+            size_t q = 0;//q-індекс, з якого починаємо читати одне поле всередині товару
+            while (q <= chunk.size()) {
+                size_t c = chunk.find(", ", q);//c-comma-позиція, де знаходиться ", " — розділювач між полями одного товару
+                if (c == string::npos) { p.push_back(chunk.substr(q)); break; }
+                //p-parts-Це масив рядків, у якому тимчасово зберігаються 5 частин одного товару, розбиті по ", ".
+                p.push_back(chunk.substr(q, c - q));//substr — це метод класу string, який повертає частину рядка (підрядок).
+                q = c + 2;
+            }
+            if (p.size() < 5) continue;
+
+            try {
+                // порядок у файлі: id, name, price, qty, cost
+                res.push_back(OrderItem(
+                    stoi(p[0]), p[1], stoi(p[2]), stoi(p[3]), stoi(p[4]), true));
+            } catch (...) {}
+        }
+        return res;
+    }
+
+    // vector<OrderItem> -> "id, name, price, qty, cost | ..."
+    string serialize_items(const vector<OrderItem>& items) {
+        string r;
+        for (int i = 0; i < items.size(); i++) {
+            if (i) r += " | ";
+            r += to_string(items[i].product_id) + ", "
+               + items[i].name + ", "
+               + to_string(items[i].price) + ", "
+               + to_string(items[i].quantity) + ", "
+               + to_string(items[i].cost);
+        }
+        return r;
     }
 
     void read_from_file() {
-        vector<string> lines = read_file("data/orders.txt"); // читаємо з файлу
+        vector<string> lines = read_file("data/orders.txt");
 
         for (int i = 0; i < lines.size(); i++) {
-            string line = lines[i];
-            if (line.empty()) continue;
+            if (lines[i].empty()) continue;
 
-            // Змінні для зчитування з файлу
-            string s_order_id, s_product_id, s_quantity;
-            string s_total_price, customer, status;
+            string s_oid, customer, s_cid, phone, addr, status, items_str;
+            string s_disc, comment, ca, ua, s_tp;
 
-            istringstream iss(line);
-            getline(iss, s_order_id,    '\t');
-            getline(iss, s_product_id,  '\t');
-            getline(iss, s_quantity,    '\t');
-            getline(iss, s_total_price, '\t');
-            getline(iss, customer,      '\t');
-            getline(iss, status,        '\t');
+            istringstream iss(lines[i]);
+            getline(iss, s_oid,     '\t'); getline(iss, customer, '\t');
+            getline(iss, s_cid,     '\t'); getline(iss, phone,    '\t');
+            getline(iss, addr,      '\t'); getline(iss, status,   '\t');
+            getline(iss, items_str, '\t'); getline(iss, s_disc,   '\t');
+            getline(iss, comment,   '\t'); getline(iss, ca,       '\t');
+            getline(iss, ua,        '\t'); getline(iss, s_tp,     '\t');
 
             try {
-                // Перетворюємо рядки у числа (усі гроші/кількості - int)
-                int order_id    = stoi(s_order_id);
-                int product_id  = stoi(s_product_id);
-                int quantity    = stoi(s_quantity);
-                int total_price = stoi(s_total_price);
-
-                // Викликаємо КОНСТРУКТОР 2 (для читання з файлу)
-                // Порядок і типи аргументів повністю збігаються з конструктором:
-                // (int, int, int, int, string, string, bool)
                 Order order(
-                    order_id,     // int
-                    product_id,   // int
-                    quantity,     // int
-                    total_price,  // int
-                    customer,     // string
-                    status,       // string
-                    true          // bool — маркер "з файлу"
-                );
-
+                    stoi(s_oid), customer, stoi(s_cid), phone, addr, status,
+                    parse_items(items_str), stoi(s_disc), comment, ca, ua,
+                    stoi(s_tp), true);
                 orders.push_back(order);
-            }
-            catch (const exception& e) {
-                cout << "Невалідні дані у рядку " << (i + 1)
-                     << ": неможливо додати замовлення. Пропущено." << endl;
+            } catch (const exception&) {
+                cout << "Невалідні дані у рядку " << (i + 1) << ". Пропущено." << endl;
             }
         }
     }
 
     Order* find_by_id(int id) {
-        for (int i = 0; i < orders.size(); i++) {
-            if (orders[i].order_id == id) {
-                return &orders[i];
-            }
-        }
+        for (int i = 0; i < orders.size(); i++)
+            if (orders[i].order_id == id) return &orders[i];
         return nullptr;
     }
 
-    // Метод для збереження замовлень у файл
     void save_to_file() {
-        ofstream file("data/orders.txt");
-        if (!file.is_open()) {
-            cout << "Не вдалося відкрити файл для запису!" << endl;
-            return;
-        }
+        ofstream f("data/orders.txt");
+        if (!f.is_open()) { cout << "Не вдалося відкрити файл!" << endl; return; }
 
         for (int i = 0; i < orders.size(); i++) {
-            // Записуємо поля через табуляцію '\t', як і при читанні
-            file << orders[i].order_id    << '\t'
-                 << orders[i].product_id  << '\t'
-                 << orders[i].quantity    << '\t'
-                 << orders[i].total_price << '\t'
-                 << orders[i].customer    << '\t'
-                 << orders[i].status      << '\n';
+            f << orders[i].order_id              << '\t'
+              << orders[i].customer              << '\t'
+              << orders[i].customer_id           << '\t'
+              << orders[i].phone                 << '\t'
+              << orders[i].delivery_address      << '\t'
+              << orders[i].status                << '\t'
+              << serialize_items(orders[i].items) << '\t'
+              << orders[i].discount              << '\t'
+              << orders[i].comment               << '\t'
+              << orders[i].created_at            << '\t'
+              << orders[i].updated_at            << '\t'
+              << orders[i].total_price           << '\n';
         }
-        file.close();
+        f.close();
     }
 };
