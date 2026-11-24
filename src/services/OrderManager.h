@@ -14,8 +14,6 @@ public:
     vector<Order> orders;
 
     OrderManager() { read_from_file(); }
-
-    // "id, name, price, qty, cost | ..." -> vector<OrderItem>
     vector<OrderItem> parse_items(const string& s) {
         vector<OrderItem> res;
         if (s.empty()) return res;
@@ -27,7 +25,7 @@ public:
             pos = (sep == string::npos) ? s.size() : sep + 3;
             vector<string> p;//-порожній список рядків.
             size_t q = 0;//q-індекс, з якого починаємо читати одне поле всередині товару
-            while (q <= chunk.size()) {
+            while (q <= chunk.size()) {//chunk	рядок, у якому шукаємо (один товар)
                 size_t c = chunk.find(", ", q);//c-comma-позиція, де знаходиться ", " — розділювач між полями одного товару
                 if (c == string::npos) { p.push_back(chunk.substr(q)); break; }
                 //p-parts-Це масив рядків, у якому тимчасово зберігаються 5 частин одного товару, розбиті по ", ".
@@ -39,13 +37,14 @@ public:
             try {
                 // порядок у файлі: id, name, price, qty, cost
                 res.push_back(OrderItem(
-                    stoi(p[0]), p[1], stoi(p[2]), stoi(p[3]), stoi(p[4]), true));
+                    stoi(p[0]), p[1], stoi(p[2]), stoi(p[3]), stoi(p[4]),true));
             } catch (...) {}
         }
         return res;
     }
 
-    // vector<OrderItem> -> "id, name, price, qty, cost | ..."
+    //parse_items бере один рядок зі списком товарів (стовпець 7 файлу) і розбирає його на окремі об'єкти OrderItem.
+    //serialize_items-Вона бере вектор товарів (vector<OrderItem>) і збирає його назад в один рядок того ж формату, що й у файлі.
     string serialize_items(const vector<OrderItem>& items) {
         string r;
         for (int i = 0; i < items.size(); i++) {
@@ -79,8 +78,8 @@ public:
             try {
                 Order order(
                     stoi(s_oid), customer, stoi(s_cid), phone, addr, status,
-                    parse_items(items_str), stoi(s_disc), comment, ca, ua,
-                    stoi(s_tp), true);
+                    parse_items(items_str), stoi(s_disc), comment, static_cast<time_t>(stoll(ca)), static_cast<time_t>(stoll(ua)),
+                    stoi(s_tp));
                 orders.push_back(order);
             } catch (const exception&) {
                 cout << "Невалідні дані у рядку " << (i + 1) << ". Пропущено." << endl;
@@ -110,7 +109,7 @@ public:
               << orders[i].comment               << '\t'
               << orders[i].created_at            << '\t'
               << orders[i].updated_at            << '\t'
-              << orders[i].total_price           << '\n';
+              << orders[i].total_price           << '\t';
         }
         f.close();
     }

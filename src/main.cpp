@@ -83,11 +83,12 @@ void main_menu(){
         SetConsoleOutputCP(CP_UTF8);
         SetConsoleCP(CP_UTF8);
         _mkdir("data");
-         OrderController controller;
-    main_menu();
-    vector<string> lines = read_file("data/orders.txt");
-    for (const string &item : lines)
-            cout << item << endl;
+        cout << to_string(time_t(nullptr)) <<endl;
+        //  OrderController controller;
+    // main_menu();
+    // vector<string> lines = read_file("data/orders.txt");
+    // for (const string &item : lines)
+    //         cout << item << endl;
     
 
     return 0;
